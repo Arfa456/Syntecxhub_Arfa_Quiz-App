@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz App - SyntecxHub Project 3</title>
+  <meta name="description"
+    content="Interactive Quiz App - Test your web development knowledge with this premium quiz experience">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Floating decorative orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.6;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb-1 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #ff6b6b, #feca57);
+      top: -100px;
+      right: -100px;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .orb-2 {
+      width: 250px;
+      height: 250px;
+      background: linear-gradient(135deg, #5f27cd, #48dbfb);
+      bottom: -80px;
+      left: -80px;
+      animation: float 10s ease-in-out infinite reverse;
+    }
+
+    .orb-3 {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(135deg, #00d2d3, #54a0ff);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: float 12s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-30px) rotate(10deg);
+      }
+    }
+
+    /* Main quiz container */
+    .quiz-container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow:
+        0 25px 50px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+      width: 100%;
+      max-width: 600px;
+      padding: 40px;
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.6s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .logo-icon {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: white;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .logo-text {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #f0e6ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      text-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 400;
+    }
+
+    .category-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-top: 12px;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Progress bar */
+    .progress-container {
+      margin-bottom: 30px;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00d2d3, #54a0ff, #5f27cd);
+      background-size: 200% 100%;
+      border-radius: 10px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0;
+      }
+
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
+    /* Question card */
+    .question-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 25px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .question-number {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
+
+    .question-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #2d3748;
+      line-height: 1.5;
+    }
+
+    /* Options */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .option {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 14px;
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 1rem;
+      color: #4a5568;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 0;
+    }
+
+    .option:hover {
+      transform: translateX(8px);
+      border-color: #667eea;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25);
+    }
+
+    .option.selected {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-color: transparent;
+      color: white;
+      transform: translateX(8px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .option.selected .option-letter {
+      background: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .option.correct {
+      background: linear-gradient(135deg, #00b894, #00cec9);
+      border-color: transparent;
+      color: white;
+    }
+
+    .option.correct .option-letter {
+      background: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .option.wrong {
+      background: linear-gradient(135deg, #e74c3c, #fd79a8);
+      border-color: transparent;
+      color: white;
+    }
+
+    .option.wrong .option-letter {
+      background: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .option-letter {
+      width: 36px;
+      height: 36px;
+      background: rgba(102, 126, 234, 0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #667eea;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+
+    .option-text {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    /* Buttons */
+    .buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: space-between;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00d2d3, #54a0ff);
+      color: white;
+      box-shadow: 0 8px 25px rgba(0, 210, 211, 0.4);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(0, 210, 211, 0.5);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Start screen */
+    .start-screen {
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .start-screen .emoji {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .start-screen p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+
+    .start-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .feature-tag {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 20px;
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 18px 50px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-start:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+    }
+
+    /* Result screen */
+    .result-screen {
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .result-emoji {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      animation: celebrate 0.6s ease;
+    }
+
+    @keyframes celebrate {
+      0% {
+        transform: scale(0);
+      }
+
+      50% {
+        transform: scale(1.2);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .result-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .result-message {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+
+    .score-display {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .score-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: white;
+    }
+
+    .score-label {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .score-details {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .score-item {
+      text-align: center;
+    }
+
+    .score-item-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .score-item-label {
+      font-size: 0.85rem;
+      color: #718096;
+    }
+
+    .btn-restart {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 16px 40px;
+      font-size: 1.1rem;
+      border-radius: 50px;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-restart:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+    }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      animation: confettiFall 3s ease-out forwards;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 25px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .footer span {
+      color: #ff6b6b;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 640px) {
+      body {
+        padding: 15px;
+      }
+
+      .quiz-container {
+        padding: 25px 20px;
+        border-radius: 20px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .subtitle {
+        font-size: 0.9rem;
+      }
+
+      .question-card {
+        padding: 20px;
+      }
+
+      .question-text {
+        font-size: 1.1rem;
+      }
+
+      .option {
+        padding: 14px 16px;
+      }
+
+      .option-letter {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .score-circle {
+        width: 120px;
+        height: 120px;
+      }
+
+      .score-number {
+        font-size: 2rem;
+      }
+
+      .score-details {
+        gap: 20px;
+      }
+
+      .orb-1,
+      .orb-2,
+      .orb-3 {
+        display: none;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .quiz-container {
+        padding: 20px 15px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .logo-text {
+        font-size: 1.2rem;
+      }
+
+      .start-features {
+        flex-direction: column;
+      }
+
+      .feature-tag {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Decorative orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="quiz-container" id="quiz">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">S</div>
+        <span class="logo-text">SYNTECXHUB</span>
+      </div>
+      <h1>Quiz App</h1>
+      <p class="subtitle">Project 3 • Web Development Challenge</p>
+      <span class="category-badge">🧠 Tech & Coding</span>
+    </div>
+
+    <div id="quiz-content">
+      <!-- Quiz content injected by JS -->
+    </div>
+
+    <div class="footer">Created by Arfa <span>❤</span> • Create | Think | Solve</div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "What does HTML stand for?",
+        options: [
+          "Hyper Text Markup Language",
+          "High Text Machine Language",
+          "Hyperlinks and Text Markup Language",
+          "Home Tool Markup Language"
+        ],
+        answer: 0
+      },
+      {
+        question: "Which language is used for styling web pages?",
+        options: ["HTML", "JQuery", "CSS", "XML"],
+        answer: 2
+      },
+      {
+        question: "Which is NOT a JavaScript framework?",
+        options: ["React", "Angular", "Vue", "Django"],
+        answer: 3
+      },
+      {
+        question: "Which symbol is used for comments in JavaScript?",
+        options: ["<!-- -->", "//", "**", "##"],
+        answer: 1
+      },
+      {
+        question: "What does CSS stand for?",
+        options: [
+          "Creative Style System",
+          "Cascading Style Sheets",
+          "Computer Style Sheets",
+          "Colorful Style Sheets"
+        ],
+        answer: 1
+      },
+      {
+        question: "Which tag is used to create a hyperlink in HTML?",
+        options: ["<link>", "<a>", "<href>", "<url>"],
+        answer: 1
+      },
+      {
+        question: "What is the correct way to declare a variable in JavaScript?",
+        options: ["var myVar;", "variable myVar;", "v myVar;", "declare myVar;"],
+        answer: 0
+      },
+      {
+        question: "Which property is used to change the background color in CSS?",
+        options: ["bgcolor", "color", "background-color", "bg-color"],
+        answer: 2
+      },
+      {
+        question: "What does API stand for?",
+        options: [
+          "Application Programming Interface",
+          "Applied Programming Interface",
+          "Application Process Integration",
+          "Automatic Programming Interface"
+        ],
+        answer: 0
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let selectedOption = null;
+    let quizStarted = false;
+
+    const quizContent = document.getElementById('quiz-content');
+    const optionLetters = ['A', 'B', 'C', 'D'];
+
+    function showStartScreen() {
+      quizContent.innerHTML = `
+        <div class="start-screen">
+          <div class="emoji">🚀</div>
+          <p>Test your web development knowledge with ${questions.length} challenging questions. Choose wisely!</p>
+          <div class="start-features">
+            <span class="feature-tag">📝 ${questions.length} Questions</span>
+            <span class="feature-tag">⚡ Interactive Quiz</span>
+            <span class="feature-tag">🏆 Score Tracking</span>
+          </div>
+          <button class="btn btn-start" onclick="startQuiz()">
+            Start Quiz →
+          </button>
+        </div>
+      `;
+    }
+
+    function startQuiz() {
+      quizStarted = true;
+      currentQuestion = 0;
+      score = 0;
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      selectedOption = null;
+      const q = questions[currentQuestion];
+      const progress = ((currentQuestion) / questions.length) * 100;
+
+      quizContent.innerHTML = `
+        <div class="progress-container">
+          <div class="progress-info">
+            <span>Question ${currentQuestion + 1} of ${questions.length}</span>
+            <span>${Math.round(progress)}% Complete</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${progress}%"></div>
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-number">${currentQuestion + 1}</div>
+          <div class="question-text">${q.question}</div>
+        </div>
+
+        <div class="options">
+          ${q.options.map((opt, index) => `
+            <div class="option" onclick="selectOption(${index})" id="option-${index}">
+              <span class="option-letter">${optionLetters[index]}</span>
+              <span class="option-text">${opt}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="buttons">
+          <button class="btn btn-secondary" id="prevBtn" ${currentQuestion === 0 ? 'disabled' : ''} onclick="prevQuestion()">
+            ← Previous
+          </button>
+          <button class="btn btn-primary" id="nextBtn" disabled onclick="nextQuestion()">
+            ${currentQuestion === questions.length - 1 ? 'Submit Quiz ✓' : 'Next →'}
+          </button>
+        </div>
+      `;
+    }
+
+    function selectOption(index) {
+      const options = document.querySelectorAll('.option');
+      options.forEach(opt => opt.classList.remove('selected'));
+      document.getElementById(`option-${index}`).classList.add('selected');
+      selectedOption = index;
+      document.getElementById('nextBtn').disabled = false;
+    }
+
+    function prevQuestion() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        loadQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      const isCorrect = selectedOption === questions[currentQuestion].answer;
+      const correctAnswer = questions[currentQuestion].answer;
+
+      // Show visual feedback
+      const options = document.querySelectorAll('.option');
+      options.forEach((opt, index) => {
+        opt.style.pointerEvents = 'none'; // Disable clicking
+        if (index === correctAnswer) {
+          opt.classList.add('correct');
+        } else if (index === selectedOption && !isCorrect) {
+          opt.classList.add('wrong');
+        }
+      });
+
+      // Voice feedback using Web Speech API
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance();
+        utterance.text = isCorrect ? 'Correct! Well done!' : 'Wrong answer!';
+        utterance.rate = 1.1;
+        utterance.pitch = isCorrect ? 1.2 : 0.9;
+        utterance.volume = 0.8;
+        speechSynthesis.speak(utterance);
+      }
+
+      if (isCorrect) {
+        score++;
+      }
+
+      // Disable buttons during feedback
+      document.getElementById('nextBtn').disabled = true;
+      document.getElementById('prevBtn').disabled = true;
+
+      // Delay before moving to next question
+      setTimeout(() => {
+        currentQuestion++;
+
+        if (currentQuestion < questions.length) {
+          loadQuestion();
+        } else {
+          showResult();
+        }
+      }, 1500);
+    }
+
+
+    function showResult() {
+      const percentage = Math.round((score / questions.length) * 100);
+      let emoji, title, message;
+
+      if (percentage >= 90) {
+        emoji = '🏆';
+        title = 'Outstanding!';
+        message = 'You\'re a web development master!';
+      } else if (percentage >= 70) {
+        emoji = '🌟';
+        title = 'Great Job!';
+        message = 'You have excellent knowledge!';
+      } else if (percentage >= 50) {
+        emoji = '👍';
+        title = 'Good Effort!';
+        message = 'Keep learning and improving!';
+      } else {
+        emoji = '💪';
+        title = 'Keep Practicing!';
+        message = 'Review the basics and try again!';
+      }
+
+      // Show confetti for good scores
+      if (percentage >= 50) {
+        createConfetti();
+      }
+
+      quizContent.innerHTML = `
+        <div class="result-screen">
+          <div class="result-emoji">${emoji}</div>
+          <h2 class="result-title">${title}</h2>
+          <p class="result-message">${message}</p>
+
+          <div class="score-display">
+            <div class="score-circle">
+              <span class="score-number">${percentage}%</span>
+              <span class="score-label">Score</span>
+            </div>
+            <div class="score-details">
+              <div class="score-item">
+                <div class="score-item-value">${score}</div>
+                <div class="score-item-label">Correct</div>
+              </div>
+              <div class="score-item">
+                <div class="score-item-value">${questions.length - score}</div>
+                <div class="score-item-label">Incorrect</div>
+              </div>
+              <div class="score-item">
+                <div class="score-item-value">${questions.length}</div>
+                <div class="score-item-label">Total</div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-restart" onclick="restartQuiz()">
+            🔄 Try Again
+          </button>
+        </div>
+      `;
+    }
+
+    function createConfetti() {
+      const colors = ['#667eea', '#764ba2', '#f093fb', '#00d2d3', '#54a0ff', '#ff6b6b', '#feca57'];
+      const confettiContainer = document.createElement('div');
+      confettiContainer.className = 'confetti';
+      document.body.appendChild(confettiContainer);
+
+      for (let i = 0; i < 100; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 2 + 's';
+        piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        confettiContainer.appendChild(piece);
+      }
+
+      setTimeout(() => {
+        confettiContainer.remove();
+      }, 5000);
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      selectedOption = null;
+      showStartScreen();
+    }
+
+    // Initialize quiz
+    showStartScreen();
+  </script>
+</body>
+
+</html>
